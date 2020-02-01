@@ -1,5 +1,12 @@
+@import '~antd/dist/antd.css';
+
 .App {
-  text-align: center;
+  /* text-align: center; */
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
 }
 
 .App-logo {
