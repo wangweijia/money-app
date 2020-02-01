@@ -9,6 +9,11 @@
   flex-direction: row;
 }
 
+.Route-Content {
+  display: flex;
+  flex: 1;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
