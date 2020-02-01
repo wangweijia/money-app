@@ -1,0 +1,36 @@
+.rootDisplay {
+  display: flex;
+}
+
+.rootContent {
+  .rootDisplay;
+  flex-direction: row;
+
+  .parent {
+    .rootDisplay;
+    padding: 0 5px;;
+    // width: 100px;
+    height: 44px;
+    justify-content: center;
+    align-items: center;
+
+    border-width: 1px;
+    border-color: #000;
+    border-style: solid;
+
+    margin: 3px;
+
+    .addIconBtn {
+      margin: 5px;
+    }
+  }
+
+  .parentSelected {
+    .parent;
+    background-color: #1890ff;
+  }
+
+  .childern {
+    .rootDisplay;
+  }
+}

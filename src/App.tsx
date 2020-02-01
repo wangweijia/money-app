@@ -34,7 +34,7 @@ const App: React.FC = () => {
           <div className="Route-Content" >
               <Switch>
                 {routes.map((item, index) => {
-                  return <Route {...item.routeProps} key={index} ></Route>
+                  return <Route exact {...item.routeProps} key={index} ></Route>
                 })}
               </Switch>
           </div>
