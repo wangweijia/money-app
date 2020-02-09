@@ -1,4 +1,5 @@
 import { getRequest, postRequest } from '../utils/request';
+import LevelModel from '../pages/level/model/LevelModel';
 
 export default class LevelApi {
   static addLevel(params: {}): Promise<any> {
@@ -12,4 +13,9 @@ export default class LevelApi {
   static deleLevel(levelId: number) {
     return postRequest('/level/delete', { id: levelId });
   }
+
+  static updateLevel(params: LevelModel) {
+    return postRequest('/level/update', params);
+  }
+
 }

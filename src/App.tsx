@@ -29,12 +29,16 @@ const App: React.FC = () => {
                   </Menu.Item>
                 )
               }
+              return undefined;
             })}
           </Menu>
           <div className="Route-Content" >
               <Switch>
                 {routes.map((item, index) => {
-                  return <Route exact {...item.routeProps} key={index} ></Route>
+                  const {component} = item.routeProps;
+                  return (
+                    <Route exact key={index} {...item.routeProps} component={component} ></Route>
+                  )
                 })}
               </Switch>
           </div>

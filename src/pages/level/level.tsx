@@ -29,7 +29,7 @@ export default class Level extends React.Component<{}, IState> {
 
   getAllLevel() {
     LevelApi.allLevel({}).then(res => {
-      const { data } = res;
+      const { data } = res || {};
       this.levelArray = new LevelArray({
         list: data,
       });

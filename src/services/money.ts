@@ -9,7 +9,11 @@ export default class MoneyApi {
     return getRequest('/money', params);
   }
 
-  // static deleLevel(tagId: number) {
-  //   return postRequest('/tag/delete', { id: tagId });
-  // }
+  static deleMoney(tagId: number) {
+    return postRequest('/money/delete', { id: tagId });
+  }
+
+  static updateMoney(params: any) {
+    return postRequest('/money/update', params);
+  }
 }

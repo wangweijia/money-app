@@ -11,5 +11,9 @@ export default class TagApi {
 
   static deleTag(tagId: number) {
     return postRequest('/tag/delete', { id: tagId });
-  } 
+  }
+
+  static updateTag(item: any) {
+    return postRequest('/tag/update', item);
+  }
 }

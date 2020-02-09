@@ -2,6 +2,7 @@
 import React from 'react';
 import { Table, Tag, Button } from 'antd';
 import moment from 'moment';
+import Style from './money.less';
 import MoneyAdd from './view/moneyAdd';
 import MoneyApi from '../../services/money';
 
@@ -56,7 +57,7 @@ const columns = [
 export default class Money extends React.Component<{}, State> {
   moneyAddView: MoneyAdd | undefined;
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.state = {
@@ -93,14 +94,23 @@ export default class Money extends React.Component<{}, State> {
     })
   }
 
+  renderTable(moneys: any[]): React.ReactNode {
+    if (moneys.length > 0) {
+      return (
+        <Table columns={columns} dataSource={moneys} />
+      )
+    }
+    return undefined
+  }
+
   render(): React.ReactNode {
     const { moneys } = this.state;
     return (
-      <div>
+      <div className={Style.rootContent} >
         <div>
           <Button onClick={this.showAddMoney} >添加金额</Button>
         </div>
-        {moneys.length > 0 && <Table columns={columns} dataSource={moneys} />}
+        {this.renderTable(moneys)}
         <MoneyAdd ref={(view: MoneyAdd) => {
           this.moneyAddView = view;
         }} create={this.addMoney} />

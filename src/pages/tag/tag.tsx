@@ -1,7 +1,9 @@
 import React from 'react';
 import { Table, Button } from 'antd';
+import TagAdd from './view/tagAdd';
+
+import Styles from './tag.less'
 import TagApi from '../../services/tag';
-import TagAdd from './tagAdd';
 
 const Columns = [
   {
@@ -56,7 +58,7 @@ export default class Tag extends React.Component<{}, State> {
 
   getAllTag() {
     TagApi.allTag({}).then(res => {
-      const { data } = res;
+      const { data } = res || {};
       if (data) {
         this.setState({
           data,
@@ -80,8 +82,10 @@ export default class Tag extends React.Component<{}, State> {
 
   render(): React.ReactNode {
     return (
-      <div>
-        <Button onClick={() => this.showAddView()}>新建标签</Button>
+      <div className={Styles.rootContent} >
+        <div>
+          <Button onClick={() => this.showAddView()}>新建标签</Button>
+        </div>
         <Table
           rowKey="id"
           columns={this.Columns}

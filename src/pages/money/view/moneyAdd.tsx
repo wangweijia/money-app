@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/sort-comp */
 import React, { ChangeEvent } from 'react';
 import { Modal, Form, Input, TreeSelect, InputNumber, Select } from 'antd';
@@ -53,7 +52,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
 
   getLevel() {
     LevelApi.allLevel({}).then(res => {
-      const { data } = res;
+      const { data } = res || {};
       this.levelArray = new LevelArray({
         list: data,
       });
@@ -65,7 +64,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
 
   getTags() {
     TagApi.allTag({}).then(res => {
-      const { data } = res;
+      const { data } = res || {};
       if (data) {
         this.setState({
           allTags: data,

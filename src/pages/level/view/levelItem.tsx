@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Icon, message } from 'antd';
+import { Icon, message } from 'antd';
 import LevelModel from '../model/LevelModel';
 import Style from './levelItem.less';
 
@@ -23,12 +23,6 @@ interface Props extends React.Props<any> {
 }
 
 export default class LevelItem extends React.Component<Props, State> {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(props: Readonly<Props>) {
-    super(props);
-  }
-
-
   itemSelected = (item: LevelModel, index: number) => {
     const { levelIndex, levelPath, updateLevelPath } = this.props;
     updateLevelPath(item, index, levelIndex, levelPath);
@@ -42,7 +36,7 @@ export default class LevelItem extends React.Component<Props, State> {
 
   delItem = (e: any, currentItem: LevelModel) => {
     const { delItem } = this.props;
-    const { children, id, parent } = currentItem;
+    const { children, parent } = currentItem;
     if (parent < 0) {
       message.error('不能删除根节点');
       return;

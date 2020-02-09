@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { Modal, Form, Input } from 'antd';
-import TagApi from '../../services/tag';
+import TagApi from '../../../services/tag';
 
 interface State {
   visible: boolean;

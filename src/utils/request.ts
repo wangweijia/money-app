@@ -24,7 +24,7 @@ const codeMessage: {[key: number]: string; } = {
 };
 
 const formatUri = (uri: string): string => {
-  return `http://192.168.1.2:3000${uri}`;
+  return `http://192.168.1.7:3000${uri}`;
   // return `http://192.168.2.181:3000${uri}`;
 };
 
@@ -60,8 +60,8 @@ const request = extend({
 
 export const getRequest = (uri: string, params: {}): Promise<any> => request.get(formatUri(uri), {
     params,
-  }).then(res => {
-    const { data } = res;
+  }).then((res) => {
+    const { data } = res || {};
     return data;
   });
 
@@ -69,8 +69,8 @@ export const postRequest = (uri: string, params: {}): Promise<any> => request
     .post(formatUri(uri), {
       data: params,
     })
-    .then(res => {
-      const { data } = res;
+    .then((res) => {
+      const { data } = res || {};
       return data;
     });
 
