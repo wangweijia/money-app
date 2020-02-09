@@ -1,9 +1,9 @@
-/* eslint-disable react/sort-comp */
 import React, { ChangeEvent } from 'react';
 import { Modal, Form, Input, TreeSelect, InputNumber, Select } from 'antd';
 import LevelApi from '../../../services/level';
 import TagApi from '../../../services/tag';
 import LevelModel, { LevelArray } from '../../level/model/LevelModel';
+import MoneyModel from '../model/MoneyModel';
 
 const { Option } = Select;
 const { TreeNode } = TreeSelect;
@@ -172,6 +172,17 @@ export default class MoneyAdd extends React.Component<Props, State> {
   }
 
   render(): React.ReactNode {
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 4 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+    
     return (
       <div>
         <Modal
@@ -180,7 +191,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
           onOk={() => this.handleOk()}
           onCancel={() => this.handleCancel()}
         >
-          <Form layout="vertical" >
+          <Form {...formItemLayout} >
             <Form.Item style={{ width: '100%' }} label="金额">
               <InputNumber min={0} defaultValue={0} onChange={this.moneyChange} />
             </Form.Item>

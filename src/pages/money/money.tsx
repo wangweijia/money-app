@@ -95,12 +95,9 @@ export default class Money extends React.Component<{}, State> {
   }
 
   renderTable(moneys: any[]): React.ReactNode {
-    if (moneys.length > 0) {
-      return (
-        <Table columns={columns} dataSource={moneys} />
-      )
-    }
-    return undefined
+    return (
+      <Table columns={columns} dataSource={moneys} />
+    )
   }
 
   render(): React.ReactNode {

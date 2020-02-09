@@ -2,6 +2,8 @@ import React, { ChangeEvent } from 'react';
 import { Modal, Form, Input } from 'antd';
 import TagApi from '../../../services/tag';
 
+const { TextArea } = Input;
+
 interface State {
   visible: boolean;
   tagName: string;
@@ -71,6 +73,16 @@ export default class TagAdd extends React.Component<Props, State> {
   }
 
   render(): React.ReactNode {
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 4 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
     return (
       <div>
         <Modal
@@ -79,17 +91,15 @@ export default class TagAdd extends React.Component<Props, State> {
           onOk={() => this.handleOk()}
           onCancel={() => this.handleCancel()}
         >
-          <Form layout="inline">
-            <Form.Item label="TagName">
+          <Form {...formItemLayout} >
+            <Form.Item label="标签名">
               <Input
-                placeholder="Username"
                 onChange={(e: ChangeEvent) => this.onChangeTagName(e)}
                 value={this.state.tagName}
               />
             </Form.Item>
-            <Form.Item label="TagDes">
-              <Input
-                placeholder="Username"
+            <Form.Item label="说明">
+              <TextArea
                 onChange={(e: ChangeEvent) => this.onChangeTagDes(e)}
                 value={this.state.tagDes}
               />

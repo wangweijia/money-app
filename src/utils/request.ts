@@ -24,7 +24,7 @@ const codeMessage: {[key: number]: string; } = {
 };
 
 const formatUri = (uri: string): string => {
-  return `http://192.168.1.7:3000${uri}`;
+  return `http://127.0.0.1:3000${uri}`;
   // return `http://192.168.2.181:3000${uri}`;
 };
 
