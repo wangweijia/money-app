@@ -22,27 +22,30 @@ interface Props extends React.Props<any> {
   create: Function
 }
 
+const defaultStatus = {
+  visible: false,
+  rootItem: undefined,
+  allTags: [],
+  sum: 0,
+  des: '',
+  level: undefined,
+  tags: [],
+}
+
 export default class MoneyAdd extends React.Component<Props, State> {
   levelArray: LevelArray | undefined;
 
   constructor(props: Props) {
     super(props);
 
-    this.state = {
-      visible: false,
-      rootItem: undefined,
-      allTags: [],
-      sum: 0,
-      des: '',
-      level: undefined,
-      tags: [],
-    }
+    this.state = defaultStatus;
   }
 
   show() {
     this.setState({
+      ...defaultStatus,
       visible: true,
-    })
+    });
   }
 
   componentDidMount() {
@@ -124,7 +127,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
           style={{ width: '100%' }}
           value={this.state.level}
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-          placeholder="Please select"
+          placeholder="选择挂载节点"
           allowClear
           treeDefaultExpandAll
           onChange={this.treeChange}
@@ -141,7 +144,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
       <Form.Item label="标签">
         <Select
           mode="multiple"
-          placeholder="Please select"
+          placeholder="选择标签"
           defaultValue={[]}
           onChange={this.tagChange}
         >
@@ -193,7 +196,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
         >
           <Form {...formItemLayout} >
             <Form.Item style={{ width: '100%' }} label="金额">
-              <InputNumber min={0} defaultValue={0} onChange={this.moneyChange} />
+              <InputNumber min={0} value={this.state.sum} onChange={this.moneyChange} />
             </Form.Item>
             <Form.Item style={{ width: '100%' }} label="说明">
               <Input

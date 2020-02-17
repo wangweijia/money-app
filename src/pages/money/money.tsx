@@ -6,6 +6,9 @@ import Style from './money.less';
 import MoneyAdd from './view/moneyAdd';
 import MoneyApi from '../../services/money';
 
+import MoneyModel from './model/MoneyModel';
+import TagModel from '../tag/model/TagModel';
+
 interface State {
   moneys: any[]
 }
@@ -30,12 +33,11 @@ const columns = [
     title: '标签',
     key: 'tag',
     dataIndex: 'tag',
-    render: (tags: string) => {
-      const tagItems = JSON.parse(tags);
+    render: (tags: TagModel[]) => {
       return (
         <div>
-          {tagItems.map((tag: string) => (
-            <Tag color="gold" key={tag} >{tag}</Tag>
+          {tags.map((tag: TagModel) => (
+            <Tag color="gold" key={tag.id} >{tag.name}</Tag>
             ))}
         </div>
       )
@@ -72,9 +74,11 @@ export default class Money extends React.Component<{}, State> {
   allMoney() {
     MoneyApi.allMoney({}).then(res => {
       const { data } = res;
+      const moneys = MoneyModel.initByList(data);
+      console.log(moneys);
       this.setState({
-        moneys: data,
-      })
+        moneys: MoneyModel.initByList(data),
+      });
     })
   }
 
@@ -88,7 +92,7 @@ export default class Money extends React.Component<{}, State> {
     const { sum, des, level, tags } = item;
 
     MoneyApi.addMoney({
-      sum, des, level, tag: JSON.stringify(tags),
+      sum, des, levelId: level, tags,
     }).then(() => {
       this.allMoney();
     })
@@ -96,7 +100,7 @@ export default class Money extends React.Component<{}, State> {
 
   renderTable(moneys: any[]): React.ReactNode {
     return (
-      <Table columns={columns} dataSource={moneys} />
+      <Table rowKey='id' columns={columns} dataSource={moneys} />
     )
   }
 
