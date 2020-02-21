@@ -2,6 +2,7 @@ import { getRequest, postRequest } from '../utils/request';
 
 export default class MoneyApi {
   static addMoney(params: {}): Promise<any> {
+    console.log(params);
     return postRequest('/money/save', params);
   }
 

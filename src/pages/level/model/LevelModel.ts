@@ -32,6 +32,13 @@ export default class LevelModel {
     item.parent = this.id;
     this.children.push(item);
   }
+
+  levelFomatItem() {
+    const {id, name, des, parent} = this;
+    return {
+      id, name, des, parent
+    };
+  }
 }
 
 export class LevelArray {
@@ -67,7 +74,5 @@ export class LevelArray {
           this.rootItem = tempItem;
         }
     });
-
-    console.log(this);
   }
 }

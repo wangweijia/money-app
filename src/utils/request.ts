@@ -32,6 +32,8 @@ const formatUri = (uri: string): string => {
  * 异常处理程序
  */
 const errorHandler = (error: { response: Response }): Response => {
+  console.log(error);
+
   const { response } = error;
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
@@ -50,19 +52,28 @@ const errorHandler = (error: { response: Response }): Response => {
  */
 const request = extend({
   errorHandler, // 默认错误处理
-  requestType: 'form',
   getResponse: true,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     Accept: 'application/json;charset=utf-8',
   },
 });
+ 
+const responseVerify = (response: Response) => {
+  const {status} = response;
+  if (status !== 200) {
+    return false;
+  }
+  return true;
+}
 
 export const getRequest = (uri: string, params: {}): Promise<any> => request.get(formatUri(uri), {
     params,
   }).then((res) => {
-    const { data } = res || {};
-    return data;
+    const { data, response } = res || {};
+    if (responseVerify(response)) {
+      return data;
+    }
+    return Promise.reject(response);
   });
 
 export const postRequest = (uri: string, params: {}): Promise<any> => request
@@ -70,8 +81,11 @@ export const postRequest = (uri: string, params: {}): Promise<any> => request
       data: params,
     })
     .then((res) => {
-      const { data } = res || {};
-      return data;
+      const { data, response } = res || {};
+      if (responseVerify(response)) {
+        return data;
+      }
+      return Promise.reject(response);
     });
 
 export default request;

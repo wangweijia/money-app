@@ -14,8 +14,9 @@ interface State {
   allTags: any[],
   sum: number,
   des: string,
-  level: number | undefined,
-  tags: any[],
+  levelId: number | undefined,
+  tagsId: any[],
+  id?: number,
 }
 
 interface Props extends React.Props<any> {
@@ -28,8 +29,9 @@ const defaultStatus = {
   allTags: [],
   sum: 0,
   des: '',
-  level: undefined,
-  tags: [],
+  levelId: undefined,
+  tagsId: [],
+  id: undefined
 }
 
 export default class MoneyAdd extends React.Component<Props, State> {
@@ -41,18 +43,37 @@ export default class MoneyAdd extends React.Component<Props, State> {
     this.state = defaultStatus;
   }
 
-  show() {
+  // 重置
+  resetStatus() {
     this.setState({
-      ...defaultStatus,
-      visible: true,
-    });
+      rootItem: undefined,
+      sum: 0,
+      des: '',
+      levelId: undefined,
+      tagsId: [],
+    })
   }
 
-  componentDidMount() {
+  // 显示
+  show(money?: MoneyModel) {
     this.getLevel();
     this.getTags();
+    this.setState({
+      visible: true,
+    });
+    if (money) {
+      const {id, sum, des, levelId, tagsId} = money;
+      this.setState({
+        id, 
+        sum, 
+        des,
+        tagsId,
+        levelId,
+      });
+    }
   }
 
+  // 获取所有的层级
   getLevel() {
     LevelApi.allLevel({}).then(res => {
       const { data } = res || {};
@@ -65,6 +86,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
     });
   }
 
+  // 获取所有的标签
   getTags() {
     TagApi.allTag({}).then(res => {
       const { data } = res || {};
@@ -76,6 +98,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
     })
   }
 
+  // 说明变化
   desChange = (e: ChangeEvent | undefined) => {
     let des;
     if (e) {
@@ -87,6 +110,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
     });
   }
 
+  // 资金变化
   moneyChange = (value: number | undefined) => {
     const sum: number = value === undefined ? 0 : value;
     this.setState({
@@ -94,19 +118,14 @@ export default class MoneyAdd extends React.Component<Props, State> {
     })
   }
 
-  tagChange = (value: any[]) => {
-    this.setState({
-      tags: value,
-    })
-  }
-
-  treeChange = (value: any) => {
-    this.setState({
-      level: value,
-    })
-  }
-
+  // 渲染层级树
   renderTree() {
+    // 层级选择变化
+    const treeChange = (value: any) => {
+      this.setState({
+        levelId: value,
+      })
+    }
     // 返回树节点
     const getNode = (item: LevelModel | undefined, index: number) => {
       if (item === undefined) {
@@ -125,12 +144,12 @@ export default class MoneyAdd extends React.Component<Props, State> {
       <Form.Item label="挂载节点">
         <TreeSelect
           style={{ width: '100%' }}
-          value={this.state.level}
+          value={this.state.levelId}
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           placeholder="选择挂载节点"
           allowClear
           treeDefaultExpandAll
-          onChange={this.treeChange}
+          onChange={treeChange}
         >
           {getNode(rootItem, 0)}
         </TreeSelect>
@@ -138,15 +157,23 @@ export default class MoneyAdd extends React.Component<Props, State> {
     )
   }
 
+  // 渲染标签
   renderTags() {
-    const { allTags } = this.state;
+    // 标签选择变化
+    const tagChange = (value: any[]) => {
+      console.log(value);
+      this.setState({
+        tagsId: value,
+      })
+    }
+    const { allTags, tagsId } = this.state;
     return (
       <Form.Item label="标签">
         <Select
           mode="multiple"
           placeholder="选择标签"
-          defaultValue={[]}
-          onChange={this.tagChange}
+          value={tagsId}
+          onChange={tagChange}
         >
           {allTags.map(item => {
             const { id, name } = item;
@@ -159,17 +186,20 @@ export default class MoneyAdd extends React.Component<Props, State> {
     )
   }
 
+  // 关闭弹窗
   handleCancel = () => {
+    this.resetStatus();
     this.setState({
       visible: false,
     })
   }
 
+  // 提交
   handleOk = () => {
     const { create } = this.props;
-    const { sum, des, level, tags } = this.state;
+    const { sum, des, levelId, tagsId } = this.state;
     if (create) {
-      create({ sum, des, level, tags });
+      create({ sum, des, levelId, tagsId });
     }
     this.handleCancel();
   }
