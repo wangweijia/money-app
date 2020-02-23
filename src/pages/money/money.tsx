@@ -10,7 +10,8 @@ import MoneyModel from './model/MoneyModel';
 import TagModel from '../tag/model/TagModel';
 
 interface State {
-  moneys: any[]
+  moneys: any[],
+  moneySum: number,
 }
 
 export default class Money extends React.Component<{}, State> {
@@ -48,8 +49,8 @@ export default class Money extends React.Component<{}, State> {
     },
     {
       title: '更新时间',
-      key: 'time',
-      dataIndex: 'time',
+      key: 'editTime',
+      dataIndex: 'editTime',
       render: (time: string) => {
         const t = moment(time).format('YYYY-MM-DD HH:mm:ss')
         return (
@@ -82,6 +83,7 @@ export default class Money extends React.Component<{}, State> {
 
     this.state = {
       moneys: [],
+      moneySum: 0
     };
   }
 
@@ -89,6 +91,7 @@ export default class Money extends React.Component<{}, State> {
     this.allMoney();
   }
 
+  // 请求所有金额
   allMoney() {
     MoneyApi.allMoney({}).then(res => {
       const { data } = res;
@@ -96,6 +99,17 @@ export default class Money extends React.Component<{}, State> {
       console.log(moneys);
       this.setState({
         moneys,
+      });
+    });
+    this.sumMoney();
+  }
+
+  //  总金额
+  sumMoney() {
+    MoneyApi.sumMoney().then((res) => {
+      const { data = 0 } = res;
+      this.setState({
+        moneySum: data
       });
     })
   }
@@ -120,6 +134,13 @@ export default class Money extends React.Component<{}, State> {
     }
   }
 
+  // 更新金额
+  updateMoney = (item: MoneyModel) => {
+    MoneyApi.updateMoney(item).then(() => {
+      this.allMoney();
+    })
+  }
+
   renderTable(moneys: any[]): React.ReactNode {
     return (
       <Table rowKey='id' columns={this.columns} dataSource={moneys} />
@@ -127,16 +148,17 @@ export default class Money extends React.Component<{}, State> {
   }
 
   render(): React.ReactNode {
-    const { moneys } = this.state;
+    const { moneys, moneySum } = this.state;
     return (
       <div className={Style.rootContent} >
-        <div>
+        <h1>总金额：{moneySum.toFixed(2)}元</h1>
+        <div className={Style.headerView} >
           <Button onClick={this.showAddMoney} >添加金额</Button>
         </div>
         {this.renderTable(moneys)}
         <MoneyAdd ref={(view: MoneyAdd) => {
           this.moneyAddView = view;
-        }} create={this.addMoney} />
+        }} create={this.addMoney} edit={this.updateMoney} />
       </div>
     )
   }

@@ -20,7 +20,8 @@ interface State {
 }
 
 interface Props extends React.Props<any> {
-  create: Function
+  create: Function,
+  edit: Function
 }
 
 const defaultStatus = {
@@ -161,7 +162,6 @@ export default class MoneyAdd extends React.Component<Props, State> {
   renderTags() {
     // 标签选择变化
     const tagChange = (value: any[]) => {
-      console.log(value);
       this.setState({
         tagsId: value,
       })
@@ -196,9 +196,11 @@ export default class MoneyAdd extends React.Component<Props, State> {
 
   // 提交
   handleOk = () => {
-    const { create } = this.props;
-    const { sum, des, levelId, tagsId } = this.state;
-    if (create) {
+    const { create, edit } = this.props;
+    const { sum, des, levelId, tagsId, id } = this.state;
+    if (id) {
+      edit({sum, des, levelId, tagsId, id});
+    } else {
       create({ sum, des, levelId, tagsId });
     }
     this.handleCancel();
