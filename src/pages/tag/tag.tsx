@@ -4,22 +4,31 @@ import TagAdd from './view/tagAdd';
 
 import Styles from './tag.less'
 import TagApi from '../../services/tag';
+import { TagStatus } from './model/TagModel';
 
 const Columns = [
+  // {
+  //   title: 'id',
+  //   dataIndex: 'id',
+  //   key: 'id',
+  // },
   {
-    title: 'id',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: 'name',
+    title: '标签名字',
     dataIndex: 'name',
     key: 'name',
   },
   {
-    title: 'des',
+    title: '说明',
     dataIndex: 'des',
     key: 'des',
+  },
+  {
+    title: '状态',
+    key: 'tagStatus',
+    render: (text: any, record: any, index: number) => {
+      const { tagStatus } = record;
+      return tagStatus === TagStatus.Enable ? '启用' : '禁用';
+    },
   },
 ];
 
@@ -34,12 +43,10 @@ export default class Tag extends React.Component<{}, State> {
   Columns: any[] = [
     ...Columns,
     {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       render: (text: any, record: any, index: number) => (
-        <div>
-          <Button onClick={() => this.deleTag(record)} >删除</Button>
-        </div>
+        this.renderAction(text, record, index)
       ),
     },
   ]
@@ -74,10 +81,28 @@ export default class Tag extends React.Component<{}, State> {
     })
   }
 
+  changeTagStatus = (tagId: number, status: TagStatus) => {
+    TagApi.changeStatus(tagId, status).then(() => {
+      this.getAllTag();
+    })
+  }
+
   showAddView() {
     if (this.tagAddView) {
       this.tagAddView.show();
     }
+  }
+
+  renderAction = (text: any, record: any, index: number) => {
+    const { tagStatus, id } = record;
+    const btnName: string = tagStatus === TagStatus.Enable ? '禁用' : '启用';
+    const newStatus: TagStatus = tagStatus === TagStatus.Enable ? TagStatus.Unable : TagStatus.Enable;
+
+    return (
+      <div>
+        <Button onClick={() => this.changeTagStatus(id, newStatus)} >{btnName}</Button>
+      </div>
+    )
   }
 
   render(): React.ReactNode {

@@ -13,8 +13,8 @@ export default class MoneyApi {
     return getRequest('/money/sum', {});
   }
 
-  static deleMoney(tagId: number) {
-    return postRequest('/money/delete', { id: tagId });
+  static deleteMoney(params: {}) {
+    return postRequest('/money/delete', params);
   }
 
   static updateMoney(params: any) {

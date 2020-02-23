@@ -69,7 +69,7 @@ export default class Money extends React.Component<{}, State> {
             </Button>
           </div>
           <div>
-            <Button type="danger" block>
+            <Button type="danger" block onClick={()=>{this.deleteMoney(record)}} >
               删除
             </Button>
           </div>
@@ -137,6 +137,13 @@ export default class Money extends React.Component<{}, State> {
   // 更新金额
   updateMoney = (item: MoneyModel) => {
     MoneyApi.updateMoney(item).then(() => {
+      this.allMoney();
+    })
+  }
+
+  // 删除金额
+  deleteMoney = (item: MoneyModel) => {
+    MoneyApi.deleteMoney(item).then(() => {
       this.allMoney();
     })
   }

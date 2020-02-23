@@ -16,4 +16,8 @@ export default class TagApi {
   static updateTag(item: any) {
     return postRequest('/tag/update', item);
   }
+
+  static changeStatus(id: number, status: any) {
+    return postRequest('/tag/changeStatus', {id, status});
+  } 
 }
