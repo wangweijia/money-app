@@ -5,8 +5,138 @@ import TagApi from '../../../services/tag';
 import LevelModel, { LevelArray } from '../../level/model/LevelModel';
 import MoneyModel from '../model/MoneyModel';
 
+import { FormComponentProps } from 'antd/es/form';
+
 const { Option } = Select;
 const { TreeNode } = TreeSelect;
+
+interface FormProps extends FormComponentProps {
+  rootItem: LevelModel | undefined,
+  allTags: any[],
+  defaultValues?: any, 
+}
+
+class MoneyForm extends React.Component<FormProps, {}> {
+  // 是否有默认值
+  defaultValues?: any;
+
+  componentDidMount() {
+    const { defaultValues } = this.props;
+    const { setFieldsValue } = this.props.form;
+    if (defaultValues) {
+      setFieldsValue(defaultValues);
+    };
+  }
+
+  componentWillReceiveProps(props: any, b: any) {
+    const { defaultValues } = props;
+
+    if (JSON.stringify(defaultValues) !== JSON.stringify(this.defaultValues)) {
+      const { setFieldsValue } = props.form;
+      if (defaultValues) {
+        setFieldsValue(defaultValues);
+        this.defaultValues = defaultValues;
+      };
+    }
+
+  }
+
+  // 渲染层级树
+  renderTree() {
+    // 返回树节点
+    const getNode = (item: LevelModel | undefined, index: number) => {
+      if (item === undefined) {
+        return undefined;
+      }
+      const { children, name, id } = item;
+      const selectable = children.length === 0;
+      return (
+        <TreeNode selectable={selectable} value={id} title={name} key={id}>
+            {children.map(subItem => getNode(subItem, index + 1))}
+        </TreeNode>
+      )
+    }
+    const { rootItem } = this.props;
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form.Item label="挂载节点">
+        {getFieldDecorator('levelId', {
+          rules: [{ required: true, message: '节点不能为空' }],
+        })(
+          <TreeSelect
+          style={{ width: '100%' }}
+          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+          placeholder="选择挂载节点"
+          allowClear
+          treeDefaultExpandAll
+        >
+          {getNode(rootItem, 0)}
+        </TreeSelect>
+        )}
+      </Form.Item>
+    )
+  }
+
+  // 渲染标签
+  renderTags() {
+    const { allTags } = this.props;
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form.Item label="标签">
+        {
+          getFieldDecorator('tagsId', {})(
+            <Select
+              mode="multiple"
+              placeholder="选择标签"
+            >
+              {allTags.map(item => {
+                const { id, name } = item;
+                return (
+                  <Option key={id}>{name}</Option>
+                )
+              })}
+            </Select>
+          )
+        }
+
+      </Form.Item>
+    )
+  }
+
+  render(): React.ReactNode {
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 4 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+
+    const { getFieldDecorator } = this.props.form;
+    console.log(this.props);
+    
+    return (
+      <Form {...formItemLayout} >
+        <Form.Item style={{ width: '100%' }} label="金额">
+          {getFieldDecorator('sum', {
+            rules: [{ required: true, message: '金额不能为空' }],
+          })(<InputNumber min={0} />)}
+        </Form.Item>
+        <Form.Item style={{ width: '100%' }} label="说明">
+          {getFieldDecorator('des', {
+            rules: [{ required: true, message: '说明不能为空' }],
+          })(<Input placeholder="说明" />)}
+        </Form.Item>
+        {this.renderTree()}
+        {this.renderTags()}
+      </Form>
+    )
+  }
+}
+const WrappedMoneyForm = Form.create<FormProps>()(MoneyForm);
 
 interface State {
   visible: boolean;
@@ -17,6 +147,8 @@ interface State {
   levelId: number | undefined,
   tagsId: any[],
   id?: number,
+  form: any,
+  defaultValues?: Object
 }
 
 interface Props extends React.Props<any> {
@@ -32,11 +164,14 @@ const defaultStatus = {
   des: '',
   levelId: undefined,
   tagsId: [],
-  id: undefined
+  id: undefined,
+  form: {},
+  defaultValues: undefined,
 }
 
 export default class MoneyAdd extends React.Component<Props, State> {
   levelArray: LevelArray | undefined;
+  wrappedMoneyForm: any;
 
   constructor(props: Props) {
     super(props);
@@ -52,7 +187,9 @@ export default class MoneyAdd extends React.Component<Props, State> {
       des: '',
       levelId: undefined,
       tagsId: [],
+      defaultValues: undefined
     })
+    // this.wrappedMoneyForm.resetFields();
   }
 
   // 显示
@@ -61,17 +198,19 @@ export default class MoneyAdd extends React.Component<Props, State> {
     this.getTags();
     this.setState({
       visible: true,
+    }, () => {
+      if (money) {
+        const {id, sum, des, levelId, tagsId} = money;
+        this.setState({
+          id, 
+          sum, 
+          des,
+          tagsId,
+          levelId,
+          defaultValues: {sum, des, levelId, tagsId}
+        });
+      }
     });
-    if (money) {
-      const {id, sum, des, levelId, tagsId} = money;
-      this.setState({
-        id, 
-        sum, 
-        des,
-        tagsId,
-        levelId,
-      });
-    }
   }
 
   // 获取所有的层级
@@ -99,93 +238,6 @@ export default class MoneyAdd extends React.Component<Props, State> {
     })
   }
 
-  // 说明变化
-  desChange = (e: ChangeEvent | undefined) => {
-    let des;
-    if (e) {
-      const { value }: any = e.target;
-      des = value;
-    }
-    this.setState({
-      des,
-    });
-  }
-
-  // 资金变化
-  moneyChange = (value: number | undefined) => {
-    const sum: number = value === undefined ? 0 : value;
-    this.setState({
-      sum,
-    })
-  }
-
-  // 渲染层级树
-  renderTree() {
-    // 层级选择变化
-    const treeChange = (value: any) => {
-      this.setState({
-        levelId: value,
-      })
-    }
-    // 返回树节点
-    const getNode = (item: LevelModel | undefined, index: number) => {
-      if (item === undefined) {
-        return undefined;
-      }
-      const { children, name, id } = item;
-      const selectable = children.length === 0;
-      return (
-        <TreeNode selectable={selectable} value={id} title={name} key={id}>
-            {children.map(subItem => getNode(subItem, index + 1))}
-        </TreeNode>
-      )
-    }
-    const { rootItem } = this.state;
-    return (
-      <Form.Item label="挂载节点">
-        <TreeSelect
-          style={{ width: '100%' }}
-          value={this.state.levelId}
-          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-          placeholder="选择挂载节点"
-          allowClear
-          treeDefaultExpandAll
-          onChange={treeChange}
-        >
-          {getNode(rootItem, 0)}
-        </TreeSelect>
-      </Form.Item>
-    )
-  }
-
-  // 渲染标签
-  renderTags() {
-    // 标签选择变化
-    const tagChange = (value: any[]) => {
-      this.setState({
-        tagsId: value,
-      })
-    }
-    const { allTags, tagsId } = this.state;
-    return (
-      <Form.Item label="标签">
-        <Select
-          mode="multiple"
-          placeholder="选择标签"
-          value={tagsId}
-          onChange={tagChange}
-        >
-          {allTags.map(item => {
-            const { id, name } = item;
-            return (
-              <Option key={id}>{name}</Option>
-            )
-          })}
-        </Select>
-      </Form.Item>
-    )
-  }
-
   // 关闭弹窗
   handleCancel = () => {
     this.resetStatus();
@@ -196,28 +248,24 @@ export default class MoneyAdd extends React.Component<Props, State> {
 
   // 提交
   handleOk = () => {
-    const { create, edit } = this.props;
-    const { sum, des, levelId, tagsId, id } = this.state;
-    if (id) {
-      edit({sum, des, levelId, tagsId, id});
-    } else {
-      create({ sum, des, levelId, tagsId });
+    if (this.wrappedMoneyForm) {
+      this.wrappedMoneyForm.validateFields((err: any, values: any) => {
+        if (!err) {
+          console.log('Received values of form: ', values);
+          const { create, edit } = this.props;
+          const { id } = this.state;
+          if (id) {
+            edit({id, ...values});
+          } else {
+            create({ ...values });
+          }
+          this.handleCancel();
+        }
+      });
     }
-    this.handleCancel();
   }
 
   render(): React.ReactNode {
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 4 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-    
     return (
       <div>
         <Modal
@@ -226,20 +274,9 @@ export default class MoneyAdd extends React.Component<Props, State> {
           onOk={() => this.handleOk()}
           onCancel={() => this.handleCancel()}
         >
-          <Form {...formItemLayout} >
-            <Form.Item style={{ width: '100%' }} label="金额">
-              <InputNumber min={0} value={this.state.sum} onChange={this.moneyChange} />
-            </Form.Item>
-            <Form.Item style={{ width: '100%' }} label="说明">
-              <Input
-                placeholder="说明"
-                onChange={this.desChange}
-                value={this.state.des}
-              />
-            </Form.Item>
-            {this.renderTree()}
-            {this.renderTags()}
-          </Form>
+          <WrappedMoneyForm ref={(v) => {
+            this.wrappedMoneyForm = v;
+          }} rootItem={this.state.rootItem} allTags={this.state.allTags} defaultValues={this.state.defaultValues} />
         </Modal>
       </div>
     )
