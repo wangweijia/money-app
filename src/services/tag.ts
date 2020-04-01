@@ -9,6 +9,10 @@ export default class TagApi {
     return getRequest('/tag', {});
   }
 
+  static allEnableTags(params: {}): Promise<any> {
+    return getRequest('/tag/enableTags', {});
+  }
+
   static deleTag(tagId: number) {
     return postRequest('/tag/delete', { id: tagId });
   }

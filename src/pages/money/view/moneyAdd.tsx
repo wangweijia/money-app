@@ -228,7 +228,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
 
   // 获取所有的标签
   getTags() {
-    TagApi.allTag({}).then(res => {
+    TagApi.allEnableTags({}).then(res => {
       const { data } = res || {};
       if (data) {
         this.setState({
