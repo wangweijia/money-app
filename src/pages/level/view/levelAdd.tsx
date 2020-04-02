@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Input, Form } from 'antd';
 import LevelApi from '../../../services/level';
 
 interface State {

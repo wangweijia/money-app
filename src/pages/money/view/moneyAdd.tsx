@@ -1,16 +1,16 @@
 import React, { ChangeEvent } from 'react';
-import { Modal, Form, Input, TreeSelect, InputNumber, Select } from 'antd';
+import { Modal, Input, TreeSelect, InputNumber, Select, Form } from 'antd';
 import LevelApi from '../../../services/level';
 import TagApi from '../../../services/tag';
 import LevelModel, { LevelArray } from '../../level/model/LevelModel';
 import MoneyModel from '../model/MoneyModel';
 
-import { FormComponentProps } from 'antd/es/form';
+// import { FormComponentProps } from 'antd/Form';
 
 const { Option } = Select;
 const { TreeNode } = TreeSelect;
 
-interface FormProps extends FormComponentProps {
+interface FormProps {
   rootItem: LevelModel | undefined,
   allTags: any[],
   defaultValues?: any, 
@@ -19,12 +19,20 @@ interface FormProps extends FormComponentProps {
 class MoneyForm extends React.Component<FormProps, {}> {
   // 是否有默认值
   defaultValues?: any;
+  // form 对象
+  formRef: any;
+  
+  constructor(props: FormProps) {
+    super(props);
+
+    // form 实体
+    this.formRef = React.createRef();
+  }
 
   componentDidMount() {
     const { defaultValues } = this.props;
-    const { setFieldsValue } = this.props.form;
     if (defaultValues) {
-      setFieldsValue(defaultValues);
+      this.formRef.current.setFieldsValue(defaultValues);
     };
   }
 
@@ -32,9 +40,8 @@ class MoneyForm extends React.Component<FormProps, {}> {
     const { defaultValues } = props;
 
     if (JSON.stringify(defaultValues) !== JSON.stringify(this.defaultValues)) {
-      const { setFieldsValue } = props.form;
       if (defaultValues) {
-        setFieldsValue(defaultValues);
+        this.formRef.current.setFieldsValue(defaultValues);
         this.defaultValues = defaultValues;
       };
     }
@@ -56,13 +63,10 @@ class MoneyForm extends React.Component<FormProps, {}> {
       )
     }
     const { rootItem } = this.props;
-    const { getFieldDecorator } = this.props.form;
+
     return (
-      <Form.Item label="挂载节点">
-        {getFieldDecorator('levelId', {
-          rules: [{ required: true, message: '节点不能为空' }],
-        })(
-          <TreeSelect
+      <Form.Item label="挂载节点" rules={[{ required: true, message: '节点不能为空' }]} name="levelId" >
+        <TreeSelect
           style={{ width: '100%' }}
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           placeholder="选择挂载节点"
@@ -71,7 +75,6 @@ class MoneyForm extends React.Component<FormProps, {}> {
         >
           {getNode(rootItem, 0)}
         </TreeSelect>
-        )}
       </Form.Item>
     )
   }
@@ -79,25 +82,20 @@ class MoneyForm extends React.Component<FormProps, {}> {
   // 渲染标签
   renderTags() {
     const { allTags } = this.props;
-    const { getFieldDecorator } = this.props.form;
-    return (
-      <Form.Item label="标签">
-        {
-          getFieldDecorator('tagsId', {})(
-            <Select
-              mode="multiple"
-              placeholder="选择标签"
-            >
-              {allTags.map(item => {
-                const { id, name } = item;
-                return (
-                  <Option key={id}>{name}</Option>
-                )
-              })}
-            </Select>
-          )
-        }
 
+    return (
+      <Form.Item label="标签" name="tagsId" >
+        <Select
+          mode="multiple"
+          placeholder="选择标签"
+        >
+          {allTags.map(item => {
+            const { id, name } = item;
+            return (
+              <Option key={id} value={id} >{name}</Option>
+            )
+          })}
+        </Select>
       </Form.Item>
     )
   }
@@ -113,20 +111,14 @@ class MoneyForm extends React.Component<FormProps, {}> {
         sm: { span: 16 },
       },
     };
-
-    const { getFieldDecorator } = this.props.form;
     
     return (
-      <Form {...formItemLayout} >
-        <Form.Item style={{ width: '100%' }} label="金额">
-          {getFieldDecorator('sum', {
-            rules: [{ required: true, message: '金额不能为空' }],
-          })(<InputNumber min={0} />)}
+      <Form ref={this.formRef} {...formItemLayout} >
+        <Form.Item style={{ width: '100%' }} label="金额" rules={[{ required: true, message: '金额不能为空' }]} name="sum"  >
+          <InputNumber min={0} />
         </Form.Item>
-        <Form.Item style={{ width: '100%' }} label="说明">
-          {getFieldDecorator('des', {
-            rules: [{ required: true, message: '说明不能为空' }],
-          })(<Input placeholder="说明" />)}
+        <Form.Item style={{ width: '100%' }} label="说明" rules={[{ required: true, message: '说明不能为空' }]} name="des" >
+          <Input placeholder="说明" />
         </Form.Item>
         {this.renderTree()}
         {this.renderTags()}
@@ -134,7 +126,6 @@ class MoneyForm extends React.Component<FormProps, {}> {
     )
   }
 }
-const WrappedMoneyForm = Form.create<FormProps>()(MoneyForm);
 
 interface State {
   visible: boolean;
@@ -275,7 +266,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
           onOk={() => this.handleOk()}
           onCancel={() => this.handleCancel()}
         >
-          {visible && <WrappedMoneyForm ref={(v) => {
+          {visible && <MoneyForm ref={(v) => {
             this.wrappedMoneyForm = v;
           }} rootItem={this.state.rootItem} allTags={this.state.allTags} defaultValues={this.state.defaultValues} />}
         </Modal>

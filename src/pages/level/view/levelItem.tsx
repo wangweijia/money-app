@@ -1,5 +1,6 @@
 import React from 'react';
-import { Icon, message } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import LevelModel from '../model/LevelModel';
 import Style from './levelItem.less';
 
@@ -62,19 +63,19 @@ export default class LevelItem extends React.Component<Props, State> {
             <div className={style} key={item.id} onClick={() => this.itemSelected(item, index)} >
               {item.name}
               <div className={Style.addIconBtn} >
-                <Icon type="plus-circle" onClick={e => this.addItem(e, item)} />
+                <PlusCircleOutlined onClick={e => this.addItem(e, item)} />
               </div>
               <div className={Style.addIconBtn}>
-                <Icon type="edit" />
+                <EditOutlined />
               </div>
               <div className={Style.addIconBtn}>
-                <Icon type="delete" onClick={e => this.delItem(e, item)} />
+                <DeleteOutlined onClick={e => this.delItem(e, item)} />
               </div>
             </div>
-          )
+          );
         })}
       </div>
-    )
+    );
   }
 
   renderChildren(): React.ReactNode {
