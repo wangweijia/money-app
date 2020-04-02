@@ -38,7 +38,6 @@ class MoneyForm extends React.Component<FormProps, {}> {
         this.defaultValues = defaultValues;
       };
     }
-
   }
 
   // 渲染层级树
@@ -116,7 +115,6 @@ class MoneyForm extends React.Component<FormProps, {}> {
     };
 
     const { getFieldDecorator } = this.props.form;
-    console.log(this.props);
     
     return (
       <Form {...formItemLayout} >
@@ -176,19 +174,21 @@ export default class MoneyAdd extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = defaultStatus;
+    this.state = {...defaultStatus};
   }
 
   // 重置
   resetStatus() {
+    console.log('reset')
     this.setState({
       rootItem: undefined,
       sum: 0,
       des: '',
       levelId: undefined,
       tagsId: [],
-      defaultValues: undefined
-    })
+      defaultValues: undefined,
+      ...defaultStatus
+    });
     // this.wrappedMoneyForm.resetFields();
   }
 
@@ -266,6 +266,7 @@ export default class MoneyAdd extends React.Component<Props, State> {
   }
 
   render(): React.ReactNode {
+    const { visible } = this.state;
     return (
       <div>
         <Modal
@@ -274,9 +275,9 @@ export default class MoneyAdd extends React.Component<Props, State> {
           onOk={() => this.handleOk()}
           onCancel={() => this.handleCancel()}
         >
-          <WrappedMoneyForm ref={(v) => {
+          {visible && <WrappedMoneyForm ref={(v) => {
             this.wrappedMoneyForm = v;
-          }} rootItem={this.state.rootItem} allTags={this.state.allTags} defaultValues={this.state.defaultValues} />
+          }} rootItem={this.state.rootItem} allTags={this.state.allTags} defaultValues={this.state.defaultValues} />}
         </Modal>
       </div>
     )
